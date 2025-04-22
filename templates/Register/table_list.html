@@ -1,0 +1,133 @@
+{% extends 'layout.html'%}
+{% load static%}
+{% block title%} Mesas y Pedidos{% endblock title%}
+{% block title_pg%}Mesas y Pedidos{% endblock title_pg%}
+
+{% block content %}
+    {% include 'includes/header.html' %}
+    {%include 'includes/menu_lateral.html'%}
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            {% for data in tables_data %}
+            <div class="col-sm-12 col-md-6 col-xl-4">
+                <div class="card h-100 border-{% if data.table.is_available %}success{% else %}danger{% endif %}">
+                    <div class="card-header bg-{% if data.table.is_available %}success{% else %}danger{% endif %} text-white cursor-pointer"
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#collapseTable{{ data.table.id }}">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chevron-down me-2"></i>
+                            {{ data.table }} 
+                            <span class="float-end">Total: ${{ data.table_total|floatformat:2 }}</span>
+                        </h5>
+                    </div>
+                    
+                    <div id="collapseTable{{ data.table.id }}" class="collapse">
+                        <div class="card-body">
+                            {% if data.active_orders %}
+                                {% for order in data.active_orders %}
+                                <div class="border-bottom mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6>Orden #{{ order.order_number }}</h6>
+                                        <div class="btn-group">
+                                            <form method="post" class="me-2">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                <button type="submit" name="action" value="mark_paid" 
+                                                        class="btn btn-sm {% if order.is_paid %}btn-secondary{% else %}btn-success{% endif %}"
+                                                        {% if order.is_paid %}disabled{% endif %}>
+                                                    <i class="fas fa-cash-register"></i> 
+                                                    {% if order.is_paid %}Pagado{% else %}Cobrar{% endif %}
+                                                </button>
+                                            </form>
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                <button type="submit" name="action" value="mark_delivered" 
+                                                        class="btn btn-sm {% if order.is_delivered %}btn-secondary{% else %}btn-warning{% endif %}"
+                                                        {% if order.is_delivered %}disabled{% endif %}>
+                                                    <i class="fas fa-check-circle"></i> 
+                                                    {% if order.is_delivered %}Entregado{% else %}Entregar{% endif %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="ms-3">
+                                        {% for item in order.items %}
+                                        <div class="mb-2">
+                                            <strong>{{ item.dish.name }}</strong>
+                                            <div class="d-flex justify-content-between">
+                                                <span>
+                                                    {{ item.quantity }} x ${{ item.dish.price|floatformat:2 }} 
+                                                    = ${{ item.total_price|floatformat:2 }}
+                                                </span>
+                                                {% if item.note %}
+                                                <small class="text-muted">Nota: {{ item.note }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        <div class="text-end fw-bold">
+                                            Total orden: ${{ order.total|floatformat:2 }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <!-- Botón Cobrar Todo -->
+                                <div class="mt-4 text-center">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="table_id" value="{{ data.table.id }}">
+                                        <button type="submit" 
+                                                name="action" 
+                                                value="pay_all"
+                                                class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-money-bill-wave me-2"></i>
+                                            Cobrar Todo (${{ data.table_total|floatformat:2 }})
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                            {% else %}
+                                <div class="text-center text-muted">
+                                    No hay pedidos activos
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        .btn-group .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar tooltips
+        [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        .forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Control de iconos collapse
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+            el.addEventListener('click', function() {
+                const target = document.querySelector(this.dataset.bsTarget);
+                const icon = this.querySelector('i.fas');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+    });
+    </script>
+{% endblock content %}

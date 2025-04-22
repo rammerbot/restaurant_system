@@ -1,0 +1,7 @@
+<h1>Eliminar Usuario</h1>
+<p>¿Estás seguro de eliminar a {{ object.username }}?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>

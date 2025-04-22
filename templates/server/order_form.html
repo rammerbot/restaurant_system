@@ -1,0 +1,147 @@
+{% extends 'layout.html'%}
+{% load static%}
+{% block title%} Cargar Orden {% endblock title%}
+{% block title_pg%}Crear Orden{% endblock title_pg%}
+
+{% block content %}
+{% include 'includes/header.html' %}
+{%include 'includes/menu_lateral.html'%}
+<div class="container-fluid px-4">
+    <div class="card-margin">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Seleccionar Mesa</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.table.label_tag }}
+                            {{ form.table }}
+                            {{ form.table.errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                {% for block in categorized_dishes %}
+                <div class="col-sm-12 col-md-6 col-xl-4">
+                    <div class="card card-warning border-warning">
+                        <div class="card-header bg-warning text-dark cursor-pointer hover-effect" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#collapseCategory{{ block.category.id }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ block.category.image.url }}" 
+                                         class="me-3" 
+                                         width="50" 
+                                         height="30" 
+                                         style="object-fit: cover; border-radius: 4px;"
+                                         alt="{{ block.category.category }}">
+                                    <h5 class="mb-0">{{ block.category.category }}</h5>
+                                </div>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        
+                        <div id="collapseCategory{{ block.category.id }}" class="collapse">
+                            <div class="card-body">
+                                {% for it in block.items %}
+                                <div class="card border-warning shadow mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="{{ it.dish.image.url }}" 
+                                                 class="img-thumbnail me-3" 
+                                                 width="80" 
+                                                 height="60" 
+                                                 alt="{{ it.dish.name }}">
+                                            <div>
+                                                <h4 class="mb-1">{{ it.dish.name }}</h4>
+                                                <p class="text-muted small mb-0">{{ it.dish.description }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-8">
+                                                <span class="h5">${{ it.dish.price|floatformat:2 }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <div class="form-group">
+                                                {{ it.qty_field.label_tag }}
+                                                {{ it.qty_field }}
+                                                {{ it.qty_field.errors }}
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                {{ it.note_field.label_tag }}
+                                                {{ it.note_field }}
+                                                {{ it.note_field.errors }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-file-invoice me-2"></i>Generar Orden
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card-margin {
+        margin: 20px 0;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .hover-effect:hover {
+        filter: brightness(75%);
+        transition: filter 0.2s ease;
+    }
+    .img-thumbnail {
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    .form-group label {
+        font-weight: 500;
+        color: #333;
+    }
+    .form-control {
+        border-radius: 5px;
+        padding: 8px 12px;
+    }
+    .card-header h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Control de iconos collapse
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+        el.addEventListener('click', function() {
+            const icon = this.querySelector('i.fas');
+            if (icon) {
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            }
+        });
+    });
+});
+</script>
+{% endblock content %}

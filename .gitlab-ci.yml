@@ -1,0 +1,17 @@
+workflow:
+  auto_cancel:
+    on_job_failure: all
+
+stages:
+  - trigger
+  
+trigger:
+  stage: trigger
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "staging"'
+  trigger:
+    project: DineVantage/lite-ci
+    strategy: depend
+    branch: $CI_COMMIT_REF_NAME
+  variables:
+    UPSTREAM_PROJECT_NAME: $CI_PROJECT_NAME

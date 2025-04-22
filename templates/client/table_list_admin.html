@@ -1,0 +1,9 @@
+<h2>Lista de Empleados</h2>
+<ul>
+    {% for table in tables %}
+        <li>{{table.number }}</li>
+    {% empty %}
+        <li>No hay mesas cargadas aun.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'client:create_table' %}">Agregar nuevo</a>

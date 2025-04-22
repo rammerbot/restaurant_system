@@ -1,0 +1,33 @@
+
+<h1>Platillos</h1>
+<a href="{% url 'client:dish_create' %}" class="btn btn-success mb-3">Nuevo Platillo</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Categoría</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dish in dishes %}
+        <tr>
+            <td>{{ dish.name }}</td>
+            <td>${{ dish.price }}</td>
+            <td>{{ dish.category.category }}</td>
+            <td>
+                {% if dish.image %}
+                <img src="{{ dish.image.url }}" alt="{{ dish.name }}" width="50">
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'client:dish_update' dish.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'client:dish_delete' dish.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

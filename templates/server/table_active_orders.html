@@ -1,0 +1,31 @@
+<h2>Órdenes activas para {{ table }}</h2>
+
+{% if active_items %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th># Orden</th>
+                <th>Plato</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Nota</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in active_items %}
+            <tr>
+                <td>{{ item.order.order_number }}</td>
+                <td>{{ item.dish.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.dish.price }}</td>
+                <td>{{ item.note|default:"-" }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Total a pagar: ${{ total_amount }}</h3>
+{% else %}
+    <p>No hay órdenes activas para esta mesa.</p>
+{% endif %}

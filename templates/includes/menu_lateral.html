@@ -1,0 +1,130 @@
+<div class="nano">
+    <div class="nano-content">
+        <nav id="menu" class="nav-main" role="navigation">
+
+            <ul class="nav nav-main">
+                <li>
+                    <a class="nav-link" href="layouts-default.html">
+                        <i class="bx bx-home-alt" aria-hidden="true"></i>
+                        <span>Home</span>
+                    </a>                        
+                </li>
+                <li class="nav-parent">
+                    <a class="nav-link" href="#">
+                        <i class="bx bx-cart-alt" aria-hidden="true"></i>
+                        <span>Cuentas Abiertas</span>
+                    </a>
+                    <ul class="nav nav-children">
+                        <li>
+                            <a class="nav-link" href="{% url 'register:table_list' %}">
+                                Mesas - Cobros
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="{% url 'server:create_order' %}">
+                                Crear Ordenes
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-parent nav-expanded nav-active">
+                    <a class="nav-link" href="#">
+                        <i class="bx bx-file" aria-hidden="true"></i>
+                        <span>Ordenes</span>
+                    </a>
+                    <ul class="nav nav-children">
+                        <li>
+                            <a class="nav-link" href="{% url 'register:table_list' %}">
+                                Mesas - Cobros
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="{% url 'server:create_order' %}">
+                                Crear Ordenes
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-parent">
+                    <a class="nav-link" href="#">
+                        <i class="bx bx-collection" aria-hidden="true"></i>
+                        <span>Mesas</span>
+                    </a>
+                    <ul class="nav nav-children">
+                        <li>
+                            <a>
+                                First Level
+                            </a>
+                        </li>
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                Second Level
+                            </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a>
+                                        Second Level Link #1
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        Second Level Link #2
+                                    </a>
+                                </li>
+                                <li class="nav-parent">
+                                    <a class="nav-link" href="#">
+                                        Third Level
+                                    </a>
+                                    <ul class="nav nav-children">
+                                        <li>
+                                            <a>
+                                                Third Level Link #1
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                Third Level Link #2
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <hr class="separator" />
+
+        <div class="sidebar-widget widget-tasks">
+            <div class="widget-header">
+                <h6>Projects</h6>
+                <div class="widget-toggle">+</div>
+            </div>
+            <div class="widget-content">
+                <ul class="list-unstyled m-0">
+                    <li><a href="#">xx Mesas ocupadas</a></li>
+                    <li><a href="#">xx Mesas disponibles</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="separator" />
+
+    </div>
+
+    <script>
+        // Maintain Scroll Position
+        if (typeof localStorage !== 'undefined') {
+            if (localStorage.getItem('sidebar-left-position') !== null) {
+                var initialPosition = localStorage.getItem('sidebar-left-position'),
+                    sidebarLeft = document.querySelector('#sidebar-left .nano-content');
+
+                sidebarLeft.scrollTop = initialPosition;
+            }
+        }
+    </script>
+
+</div>

@@ -1,0 +1,10 @@
+
+{% block content %}
+<h1>Eliminar {{ category|yesno:"Editar,Crear" }}</h1>
+<p>¿Estás seguro de eliminar "{{ category }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+    <a href="{% url 'client:category_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

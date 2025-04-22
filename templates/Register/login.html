@@ -1,0 +1,26 @@
+<!-- templates/registration/login.html -->
+{% if user.is_authenticated %}
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form action="{% url 'users:logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+    </form>
+{% else %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Iniciar sesión</button>
+    </form>
+
+    <!-- Mostrar errores -->
+    {% if form.errors %}
+        <p>Usuario o contraseña incorrectos.</p>
+    {% endif %}
+
+{% endif %}

@@ -1,0 +1,31 @@
+
+
+
+<h1>Administración de Usuarios</h1>
+<a href="{% url 'client:user_create' %}" class="btn btn-primary mb-3">Nuevo Usuario</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.first_name }} {{ user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.get_role_display }}</td>
+            <td>
+                <a href="{% url 'client:user_update' user.id %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'client:user_delete' user.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

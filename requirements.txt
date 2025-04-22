@@ -1,0 +1,4 @@
+alchemy==20.5
+Django==5.2
+pillow==11.1.0
+gunicorn==22.0.0

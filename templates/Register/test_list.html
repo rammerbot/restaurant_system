@@ -1,0 +1,9 @@
+<h2>Lista de Empleados</h2>
+<ul>
+    {% for employee in test %}
+        <li>{{employee.Employee }}</li>
+    {% empty %}
+        <li>No hay empleados aún.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'register:test' %}">Agregar nuevo</a>
