@@ -1,13 +1,16 @@
 from django.views.generic import FormView
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.db.models import Prefetch
+from django.contrib import messages
 
 from .models import Order, OrderItem
 from applications.client.models import Category, Dish
+from applications.client.views import WaiterRequiredMixin
 from .forms import OrderCreateForm
 
-class OrderCreateView(FormView):
+
+class OrderCreateView(WaiterRequiredMixin, FormView):
     template_name = 'server/order_form.html'
     form_class = OrderCreateForm
     success_url = reverse_lazy('server:create_order')  # o al success view que uses
@@ -62,4 +65,6 @@ class OrderCreateView(FormView):
             if q and q > 0:
                 OrderItem.objects.create(order=order, dish=dish, quantity=q, note=n)
 
+                
+        messages.success(self.request, f'Orden {order.order_number} creada exitosamente.')
         return redirect(self.get_success_url(), order_id=order.id)

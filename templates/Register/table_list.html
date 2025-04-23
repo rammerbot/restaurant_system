@@ -131,3 +131,25 @@
     });
     </script>
 {% endblock content %}
+
+{% block extra_js %}
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Mostrar mensajes de Django con SweetAlert2
+document.addEventListener('DOMContentLoaded', function() {
+    {% for message in messages %}
+    Swal.fire({
+        title: '{{ message.tags|title }}!',
+        text: '{{ message|escapejs }}',
+        icon: '{{ message.tags }}',
+        timer: 5000,
+        timerProgressBar: true,
+        showConfirmButton: false
+    });
+    {% endfor %}
+});
+</script>
+
+{% endblock %}

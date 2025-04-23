@@ -1,0 +1,263 @@
+{% extends 'layout.html'%}
+{% load static%}
+{% block title%} Mesas y Pedidos{% endblock title%}
+{% block title_pg%}Mesas y Pedidos{% endblock title_pg%}
+
+{% block content %}
+{% include 'includes/header.html' %}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Reporte de Ventas</h1>
+    
+    <!-- Filtros (Modificado para datetime-local) -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter mr-1"></i>
+            Filtros
+        </div>
+        <div class="card-body">
+            <form method="get" class="form-inline">
+                <div class="form-group mr-3">
+                    <label for="report_type" class="mr-2">Tipo de Reporte:</label>
+                    <select name="report_type" id="report_type" class="form-control">
+                        <option value="daily" {% if report_type == 'daily' %}selected{% endif %}>Diario</option>
+                        <option value="weekly" {% if report_type == 'weekly' %}selected{% endif %}>Semanal</option>
+                        <option value="monthly" {% if report_type == 'monthly' %}selected{% endif %}>Mensual</option>
+                        <option value="yearly" {% if report_type == 'yearly' %}selected{% endif %}>Anual</option>
+                        <option value="custom" {% if report_type == 'custom' %}selected{% endif %}>Personalizado</option>
+                    </select>
+                </div>
+                
+                <!-- Cambiado a datetime-local y formato con hora -->
+                <div class="form-group mr-3" id="date-range">
+                    <label for="start_datetime" class="mr-2">Desde:</label>
+                    <input type="datetime-local" name="start_datetime" id="start_datetime" 
+                           class="form-control" 
+                           value="{{ start_datetime|date:'Y-m-d\TH:i' }}">
+                    
+                    <label for="end_datetime" class="ml-2 mr-2">Hasta:</label>
+                    <input type="datetime-local" name="end_datetime" id="end_datetime" 
+                           class="form-control" 
+                           value="{{ end_datetime|date:'Y-m-d\TH:i' }}">
+                </div>
+                
+                <!-- Filtros de mesero y mesa (Sin cambios) -->
+                <div class="form-group mr-3">
+                    <label for="waiter" class="mr-2">Mesero:</label>
+                    <select name="waiter" id="waiter" class="form-control">
+                        <option value="">Todos</option>
+                        {% for waiter in waiters %}
+                        <option value="{{ waiter.id }}" {% if current_waiter == waiter.id %}selected{% endif %}>
+                            {{ waiter.get_full_name|default:waiter.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group mr-3">
+                    <label for="table" class="mr-2">Mesa:</label>
+                    <select name="table" id="table" class="form-control">
+                        <option value="">Todas</option>
+                        {% for table in tables %}
+                        <option value="{{ table.id }}" {% if current_table == table.id %}selected{% endif %}>
+                            Mesa {{ table.number }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Generar
+                </button>
+                
+                <!-- Botones de exportación (Sin cambios) -->
+                <button type="button" class="btn btn-success ml-2" id="export-pdf">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </button>
+                
+                <button type="button" class="btn btn-secondary ml-2" id="export-excel">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Resumen General (Modificado para mostrar hora) -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary mb-4">
+                <div class="card-body">
+                    <h5>Ventas Totales</h5>
+                    <h3>${{ total_sales|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success mb-4">
+                <div class="card-body">
+                    <h5>Órdenes Totales</h5>
+                    <h3>{{ total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info  mb-4">
+                <div class="card-body">
+                    <h5>Promedio por Orden</h5>
+                    <h3>${{ average_per_order|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <!-- Modificado el formato de fecha para incluir hora -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning mb-4">
+                <div class="card-body">
+                    <h5>Período</h5>
+                    <h3>{{ start_datetime|date:"d/m/Y H:i" }} - {{ end_datetime|date:"d/m/Y H:i" }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de Ventas (Contenedor modificado) -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-line mr-1"></i>
+            Evolución de Ventas
+        </div>
+        <div class="card-body">
+            <div id="salesChart" style="width:100%; height:400px;"></div>
+        </div>
+    </div>
+    
+    <!-- Tablas de Datos (Sin cambios) -->
+    <div class="row">
+        <!-- Por Mesa -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-table mr-1"></i>
+                    Ventas por Mesa
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Mesa</th>
+                                    <th>Ventas</th>
+                                    <th>Órdenes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in table_data %}
+                                <tr>
+                                    <td>Mesa {{ item.table_name }}</td>
+                                    <td>${{ item.total_sales|floatformat:2 }}</td>
+                                    <td>{{ item.order_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Por Mesero -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user mr-1"></i>
+                    Ventas por Mesero
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Atendido por</th>
+                                    <th>Ventas</th>
+                                    <th>Órdenes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in waiter_data %}
+                                <tr>
+                                    <td>{{ item.waiter_name }}</td>
+                                    <td>${{ item.total_sales|floatformat:2 }}</td>
+                                    <td>{{ item.order_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Script del gráfico (Modificado para formato de hora) -->
+<script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const salesData = {
+        dates: [
+            {% for item in sales_data %}
+                "{{ item.period|date:'Y-m-d H:i' }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        amounts: [
+            {% for item in sales_data %}
+                {{ item.total_sales|default:0 }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    };
+
+    const container = document.getElementById('salesChart');
+    
+    if (salesData.dates.length > 0 && salesData.amounts.length > 0) {
+        const trace = {
+            x: salesData.dates,
+            y: salesData.amounts,
+            type: 'scatter',
+            mode: 'lines',
+            line: { shape: 'spline', color: '#3b82f6' }
+        };
+
+        const layout = {
+            xaxis: { 
+                title: 'Fecha y Hora',
+                type: 'date',
+                tickformat: '%d/%m/%Y %H:%M',
+                fixedrange: true
+            },
+            yaxis: { 
+                title: 'Monto ($)',
+                fixedrange: true,
+                gridcolor: '#f5f5f5'
+            },
+            hovermode: false,
+            showlegend: false,
+            margin: { t: 20 },
+            autosize: true,
+            dragmode: false
+        };
+
+        const config = {
+            responsive: true,
+            staticPlot: true
+        };
+
+        Plotly.newPlot(container, [trace], layout, config);
+
+    } else {
+        container.innerHTML = '<div class="alert alert-warning">No hay datos disponibles</div>';
+    }
+});
+</script>
+{% endblock %}

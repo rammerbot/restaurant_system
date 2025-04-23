@@ -1,0 +1,51 @@
+{% extends 'layout.html'%}
+{% load static%}
+{% block title%} Nueva Mesa {% endblock title%}
+{% block title_pg%}Gestión de Mesas{% endblock title_pg%}
+
+{% block content %}
+{% include 'includes/header.html' %}
+{%endblock content%}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar mensajes de Django
+    {% for message in messages %}
+    Swal.fire({
+        title: '{{ message.tags|title }}!',
+        text: '{{ message|escapejs }}',
+        icon: '{{ message.tags }}',
+        timer: 5000,
+        timerProgressBar: true,
+        showConfirmButton: false
+    });
+    {% endfor %}
+
+    // Control de iconos collapse
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+        el.addEventListener('click', function() {
+            const icon = this.querySelector('i.fas');
+            if (icon) {
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            }
+        });
+    });
+
+    // Validación de formulario
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault()
+                e.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    });
+});
+</script>
+{% endblock %}

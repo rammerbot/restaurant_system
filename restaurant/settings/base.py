@@ -47,6 +47,7 @@ TENANT_APPS = [
     'applications.client',
     'applications.server',
     'applications.register',
+    'applications.salesreport',
 ]
 
 INSTALLED_APPS = SHARED_APPS + [ app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -62,6 +63,12 @@ MIDDLEWARE = [
     'applications.app.middleware.TenantAccessMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+LOGIN_URL = 'register:login' # URL de inicio de sesion
+LOGIN_REDIRECT_URL = 'home'  # Opcional, a dónde redirige después de login
+LOGOUT_REDIRECT_URL = 'login'  # Otra forma de definir el redirect
 
 AUTH_USER_MODEL = 'users.CustomUser' 
 # Tenant model y domain model

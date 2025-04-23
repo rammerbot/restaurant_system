@@ -4,7 +4,7 @@ from applications.client.models import Table, Dish, Category
 
 class OrderCreateForm(forms.Form):
     table = forms.ModelChoiceField(
-        queryset=Table.objects.all(),
+        queryset=Table.objects.all().order_by('number'),
         label="Mesa",
         required=True,
         widget=forms.Select(attrs={'class': 'form-control mb-4'})

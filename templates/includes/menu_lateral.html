@@ -4,95 +4,83 @@
 
             <ul class="nav nav-main">
                 <li>
-                    <a class="nav-link" href="layouts-default.html">
+                    <a class="nav-link" href="{% url 'client:home' %}">
                         <i class="bx bx-home-alt" aria-hidden="true"></i>
                         <span>Home</span>
                     </a>                        
                 </li>
+                {% if user.is_authenticated %}
                 <li class="nav-parent">
                     <a class="nav-link" href="#">
                         <i class="bx bx-cart-alt" aria-hidden="true"></i>
-                        <span>Cuentas Abiertas</span>
+                        <span>Mesas y Ordenes</span>
                     </a>
                     <ul class="nav nav-children">
-                        <li>
-                            <a class="nav-link" href="{% url 'register:table_list' %}">
-                                Mesas - Cobros
-                            </a>
-                        </li>
+                        {% if user.role == 'CAJERO' or user.role == 'TENANT_ADMIN' %}
+                            <li>
+                                <a class="nav-link" href="{% url 'register:table_list' %}">
+                                    Mesas - Cobros
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{% url 'server:create_order' %}">
+                                    Crear Ordenes
+                                </a>
+                            </li>
+                        {% else %}
                         <li>
                             <a class="nav-link" href="{% url 'server:create_order' %}">
                                 Crear Ordenes
                             </a>
                         </li>
+                        {% endif %}
                     </ul>
                 </li>
-                <li class="nav-parent nav-expanded nav-active">
-                    <a class="nav-link" href="#">
-                        <i class="bx bx-file" aria-hidden="true"></i>
-                        <span>Ordenes</span>
-                    </a>
-                    <ul class="nav nav-children">
-                        <li>
-                            <a class="nav-link" href="{% url 'register:table_list' %}">
-                                Mesas - Cobros
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-link" href="{% url 'server:create_order' %}">
-                                Crear Ordenes
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-parent">
-                    <a class="nav-link" href="#">
-                        <i class="bx bx-collection" aria-hidden="true"></i>
-                        <span>Mesas</span>
-                    </a>
-                    <ul class="nav nav-children">
-                        <li>
-                            <a>
-                                First Level
-                            </a>
-                        </li>
-                        <li class="nav-parent">
-                            <a class="nav-link" href="#">
-                                Second Level
-                            </a>
-                            <ul class="nav nav-children">
-                                <li>
-                                    <a>
-                                        Second Level Link #1
-                                    </a>
-                                </li>
-                                <li>
-                                    <a>
-                                        Second Level Link #2
-                                    </a>
-                                </li>
-                                <li class="nav-parent">
-                                    <a class="nav-link" href="#">
-                                        Third Level
-                                    </a>
-                                    <ul class="nav nav-children">
-                                        <li>
-                                            <a>
-                                                Third Level Link #1
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a>
-                                                Third Level Link #2
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
+                {% if user.role == 'CAJERO' or user.role == 'TENANT_ADMIN' %}
+                    <li class="nav-parent ">
+                        <a class="nav-link" href="#">
+                            <i class="bx bx-file" aria-hidden="true"></i>
+                            <span>Reportes</span>
+                        </a>
+                        <ul class="nav nav-children">                        
+                            <li>
+                                <a class="nav-link" href="{% url 'salesreport:sales_report' %}">
+                                    Reporte de Ventas
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if user.role == 'TENANT_ADMIN' %}
+                    <li class="nav-parent">
+                        <a class="nav-link" href="#">
+                            <i class="bx bx-collection" aria-hidden="true"></i>
+                            <span>Administracion</span>
+                        </a>
+                        <ul class="nav nav-children">
+                            <li>
+                                <a class="nav-link" href="{% url 'client:table_list_admin' %}">
+                                    Mesas
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{% url 'client:category_list' %}">
+                                    Categoria
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{% url 'client:dish_list' %}">
+                                    Platos y Bebidas
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{% url 'client:user_list' %}">
+                                    Usuarios
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
 
@@ -112,6 +100,8 @@
         </div>
 
         <hr class="separator" />
+    
+        {% endif %}
 
     </div>
 

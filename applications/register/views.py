@@ -9,19 +9,26 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Sum, F, DecimalField
 
 from applications.client.models import Table
-from applications.server.models import Order, OrderItem
+from applications.server.models import Order
 from applications.client.models import Table
+from applications.client.views import CashierRequiredMixin
 
 
 # Login
 class CustomLoginView(LoginView):
     template_name = 'register/login.html'  
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, '✅ ¡Bienvenido! Sesión iniciada correctamente')
+        return response
 
 # Vista para listar mesas
-class TableListView(ListView):
+class TableListView(CashierRequiredMixin, ListView):
     model = Table
     template_name = 'register/table_list.html'
     context_object_name = 'tables'
+    ordering = ['number']
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
@@ -123,37 +130,4 @@ class TableListView(ListView):
         context['tables_data'] = tables_data
         return context
 
-#-----------------------------------------------------------------------------------------------------------------------#
-
-class TableActiveOrdersView(DetailView):
-    model = Table
-    template_name = 'server/table_active_orders.html'
-    context_object_name = 'table'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table = self.get_object()
-
-        # Obtener órdenes activas (no pagadas y no entregadas) para esta mesa
-        active_orders = Order.objects.filter(
-            table=table,
-            is_paid=False,
-            is_delivered=False
-        )
-
-        # Obtener todos los ítems de esas órdenes
-        active_items = OrderItem.objects.filter(order__in=active_orders).annotate(
-            total_price=F('quantity') * F('dish__price')
-        )
-
-        # Total general a pagar
-        total_amount = active_items.aggregate(
-            total=Sum('total_price', output_field=DecimalField())
-        )['total'] or 0
-
-        context['active_orders'] = active_orders
-        context['active_items'] = active_items
-        context['total_amount'] = total_amount
-
-        return context
 

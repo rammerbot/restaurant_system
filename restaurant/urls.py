@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('applications.users.urls')),
     path('', include('applications.client.urls')),
     path('', include('applications.server.urls')),
+    path('', include('applications.salesreport.urls')),
 ]
 
 
