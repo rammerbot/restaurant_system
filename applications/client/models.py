@@ -8,8 +8,10 @@ from applications.app.models import BaseModel
 class Table(BaseModel):
     number = models.IntegerField(verbose_name="Numero de mesa", unique=True)
     is_available = models.BooleanField(verbose_name="Disponible", default=True)
+    
     def __str__(self):
         return f"Mesa {str(self.number)}"
+    
 
 class Category(BaseModel):
     category = models.CharField(verbose_name="Categoria", max_length=100)
